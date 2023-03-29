@@ -31,7 +31,7 @@ import {computed, defineComponent, onMounted} from 'vue';
 import {useStore} from 'vuex';
 import {message} from 'ant-design-vue';
 import {useRouter} from 'vue-router';
-import {EditWrapper} from '../components/EditWrapper.vue';
+import EditWrapper from '../components/EditWrapper.vue';
 
 export default defineComponent({
   components: {
