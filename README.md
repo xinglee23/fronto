@@ -1,9 +1,9 @@
 # A Visual Editor
 
-## feature
+## Feature
 
 - out of the box
-- **typescript**
+- typescript
 - Vue3
 - support tsx
 - eslint
@@ -25,3 +25,4 @@
 - [ ] 组件库
 - [ ] 作品列表
 - [ ] 登录、登出
+- [ ] 部署
