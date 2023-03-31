@@ -1,4 +1,5 @@
 import {textDefaultProps} from 'lego-bricks';
+
 const defaultTextTemplates = [
   {
     text: '大标题',

@@ -3,15 +3,40 @@
     <a-layout :style="{background: '#fff'}">
       <a-layout-header class="header">
         <router-link to="/">
-          <div className="header-icon">
+          <div class="header-icon">
             <img :src="logo" />
-            <div className="page-title">Fronto</div>
+            <div class="page-title">Fronto</div>
           </div>
         </router-link>
         <a-space>
-          <a-button type="primary" shape="round">预览</a-button>
-          <a-button type="primary" shape="round">发布</a-button>
-          <a-button type="primary" shape="round">登陆</a-button>
+          <template v-if="isEditor">
+            <a-button type="primary" shape="round">预览</a-button>
+            <a-button type="primary" shape="round">发布</a-button>
+          </template>
+          <template v-if="isHome">
+            <a-button type="primary" shape="round">登录</a-button>
+            <!-- <a-button type="primary" shape="round">退出登录</a-button> -->
+            <a-button type="danger" @click="showModal" shape="round"
+              >AI 模式</a-button
+            >
+            <a-radio-button
+              v-if="language === 'zh'"
+              value="zh"
+              @click="handleLanguageChange('en')"
+              >中文</a-radio-button
+            >
+            <a-radio-button
+              value="en"
+              v-if="language === 'en'"
+              @click="handleLanguageChange('zh')"
+              >English</a-radio-button
+            >
+            <a-button type="text" shape="circle">
+              <template #icon
+                ><github-outlined style="font-size: 22px; color: #fff"
+              /></template>
+            </a-button>
+          </template>
         </a-space>
       </a-layout-header>
       <a-layout-content>
@@ -23,46 +48,62 @@
   <div v-else>
     <router-view></router-view>
   </div>
+  <a-modal
+    v-model:visible="visible"
+    title="ChatAI Bot"
+    okText="确定"
+    cancelText="取消"
+    @ok="handleOk"
+  >
+    <p>Chat with AI Bot</p>
+    <a-textarea placeholder="Ask anything" :rows="3" />
+  </a-modal>
 </template>
 
-<script lang="ts">
-import {computed, defineComponent} from 'vue';
+<script lang="ts" setup>
+import {ref, computed} from 'vue';
 import {useRoute} from 'vue-router';
+import {GithubOutlined} from '@ant-design/icons-vue';
+import {OPENAI_API_KEY, ORG_ID} from './constant';
+import {Configuration, OpenAIApi} from 'openai';
+
 import logo from './assets/logo.svg';
 
-export default defineComponent({
-  name: 'App',
-  components: {},
-  setup() {
-    const route = useRoute();
-    const withHeader = computed(() => route.meta.withHeader);
-    const withFooter = computed(() => route.meta.withFooter);
+const route = useRoute();
+const visible = ref<boolean>(false);
+const language = ref<string>('zh');
+const withHeader = computed(() => route.meta.withHeader);
+const withFooter = computed(() => route.meta.withFooter);
+const isEditor = computed(() => route.meta.isEditor);
+const isHome = computed(() => route.meta.isHome);
 
-    // a: 手机号码的正则怎么写？
+const getOpenAi = async () => {
+  const configuration = new Configuration({
+    organization: ORG_ID,
+    apiKey: OPENAI_API_KEY,
+  });
+  const openai = new OpenAIApi(configuration);
+  const response = await openai.listEngines();
 
-    return {
-      logo,
-      withHeader,
-      withFooter,
-    };
-  },
-});
+  console.log(response.data);
+};
+
+const handleLanguageChange = (value: string) => {
+  console.log(value);
+  language.value = value;
+};
+
+const showModal = () => (visible.value = true);
+
+const handleOk = () => (visible.value = false);
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
+<style scoped>
 .header {
   display: flex;
   align-content: center;
   justify-content: space-between;
-  height: 35px;
+  min-height: 35px;
 }
 .header-icon {
   display: flex;

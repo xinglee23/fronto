@@ -1,19 +1,19 @@
 <template>
-  <div className="login-page">
+  <div class="login-page">
     <a-row>
       <a-col :span="12" class="aside">
-        <div className="aside-inner">
+        <div class="aside-inner">
           <router-link to="/">
-            <img alt="慕课乐高" src="../assets/logo.png" className="logo-img" />
+            <img alt="慕课乐高" src="../assets/logo.png" class="logo-img" />
           </router-link>
           <h2>Fronto Designer</h2>
-          <span className="text-white-70">Aaron Woo</span>
+          <span class="text-white-70">Aaron Woo</span>
         </div>
       </a-col>
       <a-col :span="12" class="login-area">
         <a-form layout="vertical" :model="form" :rules="rules" ref="loginForm">
           <h2>欢迎回来</h2>
-          <p className="subTitle">使用手机号码和验证码登录到慕课乐高</p>
+          <p class="subTitle">使用手机号码和验证码登录到慕课乐高</p>
           <a-form-item label="手机号码" required name="cellphone">
             <a-input placeholder="手机号码" v-model:value="form.cellphone">
               <template v-slot:prefix

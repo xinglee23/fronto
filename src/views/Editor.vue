@@ -1,80 +1,104 @@
 <template>
-  <div class="editor-wrapper">
-    <a-row class="row-wrapper" type="flex" justify="center">
-      <a-col :span="6">
-        <div class="left">
-          <a-tabs centered v-model:activeKey="activeKey">
-            <a-tab-pane key="1" tab="文本">Content of Tab Pane 1</a-tab-pane>
-            <a-tab-pane key="2" tab="图文" force-render
-              >Content of Tab Pane 2</a-tab-pane
-            >
-            <a-tab-pane key="3" tab="形状">Content of Tab Pane 3</a-tab-pane>
-          </a-tabs>
+  <div class="editor-container">
+    <div class="left">
+      <component-list
+        :list="defaultTextTemplates"
+        @on-item-click="addItem"
+      ></component-list>
+      <img id="test-image" :style="{width: '300px'}" />
+    </div>
+    <div class="center">
+      <div
+        class="preview-list"
+        id="canvas-area"
+        :class="{'canvas-fix': canvasFix}"
+      >
+        <div class="body-container" :style="page.props">
+          <edit-wrapper
+            @setActive="setActive"
+            @update-position="updatePosition"
+            v-for="component in components"
+            :key="component.id"
+            :id="component.id"
+            :hidden="component.isHidden"
+            :props="component.props"
+            :active="component.id === currentElement?.id"
+          >
+            {{ component.name }}}
+            <component :is="component.name" v-bind="component.props" />
+          </edit-wrapper>
         </div>
-      </a-col>
-      <a-col class="center" :span="12">画布</a-col>
-      <a-col class="right" :span="6">设置面板</a-col>
-    </a-row>
-    <a-dropdown>
-      <template #overlay>
-        <a-menu>
-          <a-menu-item @click="login">login</a-menu-item>
-          <a-menu-item @click="logout"> logout </a-menu-item>
-        </a-menu>
-      </template>
-    </a-dropdown>
+      </div>
+    </div>
+    <div class="right">设置面板</div>
   </div>
 </template>
 
-<script lang="ts">
-import {computed, defineComponent, onMounted} from 'vue';
+<script lang="ts" setup>
+import {computed, ref} from 'vue';
 import {useStore} from 'vuex';
-import {message} from 'ant-design-vue';
-import {useRouter} from 'vue-router';
+import {ComponentData} from '../store/editor';
+import ComponentList from '../components/ComponentsList.vue';
+import defaultTextTemplates from '../defaultTemplates';
 import EditWrapper from '../components/EditWrapper.vue';
+import {GlobalDataProps} from '../store';
+import {pickBy} from 'lodash';
 
-export default defineComponent({
-  components: {
-    EditWrapper,
-  },
-  setup() {
-    const store = useStore();
-    const router = useRouter();
-    const login = () => {
-      store.commit('login');
-      message.success('login success', 2);
-    };
-    const logout = () => {
-      store.commit('logout');
-      router.push('/');
-    };
+const store = useStore<GlobalDataProps>();
+const canvasFix = ref<boolean>(false);
+const page = computed(() => store.state.editor.page);
+const components = computed(() => store.state.editor.components);
+const currentElement = computed<ComponentData | null>(
+  () => store.getters.getCurrentElement
+);
 
-    return {
-      login,
-      logout,
-    };
-  },
-});
+console.log('components', store.state.editor.components);
+
+const setActive = (id: string) => {
+  store.commit('setActive', id);
+};
+
+const addItem = (component: any) => {
+  console.log('onItemClick1233', component);
+  store.commit('addComponent', component);
+};
+
+const updatePosition = (data: {left: number; top: number; id: string}) => {
+  const {id} = data;
+  const updateData = pickBy<number>(data, (value, key) => key !== 'id');
+  const keysArr = Object.keys(updateData);
+  const valuesArr = Object.values(updateData).map((v) => `${v}px`);
+
+  store.commit('updatePosition', {key: keysArr, value: valuesArr, id});
+};
 </script>
 <style scoped lang="less">
-.editor-wrapper {
+.editor-container {
+  display: flex;
   color: #fff;
-  height: 100%;
-
-  .row-wrapper {
-    height: 80vh;
-  }
+  height: 100vh;
+  background-color: #e5e5e5;
 
   .left {
-    padding: 20px;
+    padding-top: 20px;
+    color: blue;
+    width: 320px;
+    height: 100%;
+    background-color: #fff;
   }
-  .left,
-  .right {
-    color: #000;
-    background: #fff;
-  }
+
   .center {
-    background: #f0f2f5;
+    position: relative;
+    padding: 30px;
+    width: 100%;
+    color: black;
+    background-color: #e5e5e5;
+  }
+
+  .right {
+    width: 430px;
+    height: 100%;
+    background-color: #fff;
   }
 }
 </style>

@@ -80,9 +80,9 @@ export default defineComponent({
     const styles = computed(() =>
       pick(props.props, ['position', 'top', 'left', 'width', 'height'])
     );
-    const calculateMovePosition = (e: MouseEvent) => {
+    const caculateMovePosition = (e: MouseEvent) => {
       const container = document.getElementById('canvas-area') as HTMLElement;
-      const left = e.clientX - gap.x - container.offsetLeft;
+      const left = e.clientX - gap.x - container?.offsetLeft;
       const top = e.clientY - gap.y - container.offsetTop + container.scrollTop;
       return {
         top,
@@ -174,7 +174,7 @@ export default defineComponent({
         gap.y = e.clientY - top;
       }
       const handleMove = (e: MouseEvent) => {
-        const {left, top} = calculateMovePosition(e);
+        const {left, top} = caculateMovePosition(e);
         isMoving = true;
         if (currentElement) {
           currentElement.style.left = `${left}px`;
@@ -185,7 +185,7 @@ export default defineComponent({
         document.removeEventListener('mousemove', handleMove);
 
         if (isMoving) {
-          const {left, top} = calculateMovePosition(e);
+          const {left, top} = caculateMovePosition(e);
           context.emit('update-position', {
             left,
             top,

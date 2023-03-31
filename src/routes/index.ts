@@ -15,6 +15,7 @@ const router = createRouter({
       meta: {
         withHeader: true,
         withFooter: true,
+        isHome: true,
       },
     },
     {
@@ -23,6 +24,7 @@ const router = createRouter({
       component: Editor,
       meta: {
         withHeader: true,
+        isEditor: true,
       },
     },
     {

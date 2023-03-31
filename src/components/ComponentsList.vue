@@ -4,40 +4,49 @@
       v-for="(item, index) in list"
       :key="index"
       class="component-item"
-      @click="onItemClick(item)"
+      @click="onItemClick(item as any)"
     >
       <l-text v-bind="item"></l-text>
     </div>
   </div>
 </template>
-<script lang="ts">
-import {defineComponent} from 'vue';
+<script lang="ts" setup>
 import {v4 as uuidv4} from 'uuid';
-import {TextComponentProps} from '@/defaultProps';
-import {ComponentData} from '@/store/editor';
-export default defineComponent({
-  props: {
-    list: {
-      type: Array,
-      required: true,
-    },
-  },
-  emits: ['on-item-click'],
-  name: 'component-list',
-  setup(props, context) {
-    const onItemClick = (props: TextComponentProps) => {
-      const componentData: ComponentData = {
-        name: 'l-text',
-        id: uuidv4(),
-        props,
-      };
+import LText from './LText.vue';
+import {TextComponentProps} from '../defaultProps';
+import {ComponentData} from '../store/editor';
 
-      context.emit('on-item-click', componentData);
-    };
-
-    return {
-      onItemClick,
-    };
+const props = defineProps({
+  list: {
+    type: Array,
+    required: true,
   },
 });
+
+const emit = defineEmits<{
+  (event: 'on-item-click', ...args: any[]): void;
+}>();
+
+console.log('cuurtre', props.list);
+
+const onItemClick = (props: TextComponentProps) => {
+  const componentData: ComponentData = {
+    name: 'l-text',
+    id: uuidv4(),
+    props,
+  };
+
+  emit('on-item-click', componentData);
+};
 </script>
+<style scoped lang="less">
+.component-item {
+  width: 100px;
+  margin: 0 auto;
+  margin-bottom: 15px;
+
+  & > * {
+    position: static !important;
+  }
+}
+</style>

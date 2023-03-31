@@ -21,6 +21,7 @@ import {
   Radio,
   Select,
 } from 'ant-design-vue';
+
 import {App} from 'vue';
 const components = [
   Avatar,
