@@ -32,7 +32,7 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+<script lang="ts" setup>
 import {defineComponent, ref, nextTick, computed} from 'vue';
 import {pick} from 'lodash-es';
 
@@ -48,168 +48,162 @@ interface OriginalPositions {
   bottom: number;
 }
 
-export default defineComponent({
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    active: {
-      type: Boolean,
-      default: false,
-    },
-    hidden: {
-      type: Boolean,
-      default: false,
-    },
-    props: {
-      type: Object,
-    },
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
   },
-  emits: ['set-active', 'update-position'],
-  setup(props, context) {
-    const editWrapper = ref<null | HTMLElement>(null);
-    const onItemClick = (id: string) => {
-      context.emit('set-active', id);
-    };
-    const gap = {
-      x: 0,
-      y: 0,
-    };
-    let isMoving = false;
-    const styles = computed(() =>
-      pick(props.props, ['position', 'top', 'left', 'width', 'height'])
-    );
-    const caculateMovePosition = (e: MouseEvent) => {
-      const container = document.getElementById('canvas-area') as HTMLElement;
-      const left = e.clientX - gap.x - container?.offsetLeft;
-      const top = e.clientY - gap.y - container.offsetTop + container.scrollTop;
-      return {
-        top,
-        left,
-      };
-    };
-    const caculateSize = (
-      direction: ResizeDirection,
-      e: MouseEvent,
-      positions: OriginalPositions
-    ) => {
-      const {clientX, clientY} = e;
-      const {left, right, top, bottom} = positions;
-      const container = document.getElementById('canvas-area') as HTMLElement;
-      const rightWidth = clientX - left;
-      const leftWidth = right - clientX;
-      const bottomHeight = clientY - top;
-      const topHeight = bottom - clientY;
-      const topOffset = clientY - container.offsetTop + container.scrollTop;
-      const leftOffset = clientX - container.offsetLeft;
-      switch (direction) {
-        case 'top-left':
-          return {
-            width: leftWidth,
-            height: topHeight,
-            top: topOffset,
-            left: leftOffset,
-          };
-        case 'top-right':
-          return {
-            width: rightWidth,
-            height: topHeight,
-            top: topOffset,
-          };
-        case 'bottom-left':
-          return {
-            width: leftWidth,
-            height: bottomHeight,
-            left: leftOffset,
-          };
-        case 'bottom-right':
-          return {
-            width: rightWidth,
-            height: bottomHeight,
-          };
-        default:
-          break;
-      }
-    };
-
-    const startResize = (direction: ResizeDirection) => {
-      const currentElement = editWrapper.value as HTMLElement;
-      const {left, right, top, bottom} = currentElement.getBoundingClientRect();
-      const handleMove = (e: MouseEvent) => {
-        const size = caculateSize(direction, e, {left, right, top, bottom});
-        const {style} = currentElement;
-        if (size) {
-          style.width = `${size.width}px`;
-          style.height = `${size.height}px`;
-          if (size.left) {
-            style.left = `${size.left}px`;
-          }
-          if (size.top) {
-            style.top = `${size.top}px`;
-          }
-        }
-      };
-
-      const handleMouseUp = (e: MouseEvent) => {
-        document.removeEventListener('mousemove', handleMove);
-        const size = caculateSize(direction, e, {left, right, top, bottom});
-        context.emit('update-position', {
-          ...size,
-          id: props.id,
-        });
-        nextTick(() => {
-          document.removeEventListener('mouseup', handleMouseUp);
-        });
-      };
-      document.addEventListener('mousemove', handleMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    };
-
-    const startMove = (e: MouseEvent) => {
-      const currentElement = editWrapper.value as HTMLElement;
-      if (currentElement) {
-        const {left, top} = currentElement.getBoundingClientRect();
-        gap.x = e.clientX - left;
-        gap.y = e.clientY - top;
-      }
-      const handleMove = (e: MouseEvent) => {
-        const {left, top} = caculateMovePosition(e);
-        isMoving = true;
-        if (currentElement) {
-          currentElement.style.left = `${left}px`;
-          currentElement.style.top = `${top}px`;
-        }
-      };
-      const handleMouseUp = (e: MouseEvent) => {
-        document.removeEventListener('mousemove', handleMove);
-
-        if (isMoving) {
-          const {left, top} = caculateMovePosition(e);
-          context.emit('update-position', {
-            left,
-            top,
-            id: props.id,
-          });
-          isMoving = false;
-        }
-        nextTick(() => {
-          document.removeEventListener('mouseup', handleMouseUp);
-        });
-      };
-      document.addEventListener('mousemove', handleMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    };
-
-    return {
-      editWrapper,
-      onItemClick,
-      styles,
-      startMove,
-      startResize,
-    };
+  active: {
+    type: Boolean,
+    default: false,
+  },
+  hidden: {
+    type: Boolean,
+    default: false,
+  },
+  props: {
+    type: Object,
   },
 });
+
+defineEmits;
+const emit = defineEmits<{
+  (event: 'set-active', ...args: any[]): void;
+  (event: 'update-position', ...args: any[]): void;
+}>();
+
+const editWrapper = ref<null | HTMLElement>(null);
+const onItemClick = (id: string) => {
+  emit('set-active', id);
+};
+const gap = {
+  x: 0,
+  y: 0,
+};
+let isMoving = false;
+const styles = computed(() =>
+  pick(props.props, ['position', 'top', 'left', 'width', 'height'])
+);
+const caculateMovePosition = (e: MouseEvent) => {
+  const container = document.getElementById('canvas-area') as HTMLElement;
+  const left = e.clientX - gap.x - container?.offsetLeft;
+  const top = e.clientY - gap.y - container.offsetTop + container.scrollTop;
+  return {
+    top,
+    left,
+  };
+};
+const caculateSize = (
+  direction: ResizeDirection,
+  e: MouseEvent,
+  positions: OriginalPositions
+) => {
+  const {clientX, clientY} = e;
+  const {left, right, top, bottom} = positions;
+  const container = document.getElementById('canvas-area') as HTMLElement;
+  const rightWidth = clientX - left;
+  const leftWidth = right - clientX;
+  const bottomHeight = clientY - top;
+  const topHeight = bottom - clientY;
+  const topOffset = clientY - container.offsetTop + container.scrollTop;
+  const leftOffset = clientX - container.offsetLeft;
+  switch (direction) {
+    case 'top-left':
+      return {
+        width: leftWidth,
+        height: topHeight,
+        top: topOffset,
+        left: leftOffset,
+      };
+    case 'top-right':
+      return {
+        width: rightWidth,
+        height: topHeight,
+        top: topOffset,
+      };
+    case 'bottom-left':
+      return {
+        width: leftWidth,
+        height: bottomHeight,
+        left: leftOffset,
+      };
+    case 'bottom-right':
+      return {
+        width: rightWidth,
+        height: bottomHeight,
+      };
+    default:
+      break;
+  }
+};
+
+const startResize = (direction: ResizeDirection) => {
+  const currentElement = editWrapper.value as HTMLElement;
+  const {left, right, top, bottom} = currentElement.getBoundingClientRect();
+  const handleMove = (e: MouseEvent) => {
+    const size = caculateSize(direction, e, {left, right, top, bottom});
+    const {style} = currentElement;
+    if (size) {
+      style.width = `${size.width}px`;
+      style.height = `${size.height}px`;
+      if (size.left) {
+        style.left = `${size.left}px`;
+      }
+      if (size.top) {
+        style.top = `${size.top}px`;
+      }
+    }
+  };
+
+  const handleMouseUp = (e: MouseEvent) => {
+    document.removeEventListener('mousemove', handleMove);
+    const size = caculateSize(direction, e, {left, right, top, bottom});
+    emit('update-position', {
+      ...size,
+      id: props.id,
+    });
+    nextTick(() => {
+      document.removeEventListener('mouseup', handleMouseUp);
+    });
+  };
+  document.addEventListener('mousemove', handleMove);
+  document.addEventListener('mouseup', handleMouseUp);
+};
+
+const startMove = (e: MouseEvent) => {
+  const currentElement = editWrapper.value as HTMLElement;
+  if (currentElement) {
+    const {left, top} = currentElement.getBoundingClientRect();
+    gap.x = e.clientX - left;
+    gap.y = e.clientY - top;
+  }
+  const handleMove = (e: MouseEvent) => {
+    const {left, top} = caculateMovePosition(e);
+    isMoving = true;
+    if (currentElement) {
+      currentElement.style.left = `${left}px`;
+      currentElement.style.top = `${top}px`;
+    }
+  };
+  const handleMouseUp = (e: MouseEvent) => {
+    document.removeEventListener('mousemove', handleMove);
+
+    if (isMoving) {
+      const {left, top} = caculateMovePosition(e);
+      emit('update-position', {
+        left,
+        top,
+        id: props.id,
+      });
+      isMoving = false;
+    }
+    nextTick(() => {
+      document.removeEventListener('mouseup', handleMouseUp);
+    });
+  };
+  document.addEventListener('mousemove', handleMove);
+  document.addEventListener('mouseup', handleMouseUp);
+};
 </script>
 <style scoped lang="less">
 .edit-wrapper {
