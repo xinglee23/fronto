@@ -66,7 +66,6 @@ const props = defineProps({
   },
 });
 
-defineEmits;
 const emit = defineEmits<{
   (event: 'set-active', ...args: any[]): void;
   (event: 'update-position', ...args: any[]): void;

@@ -8,41 +8,29 @@
     {{ text }}
   </component>
 </template>
-<script lang="ts">
-import {defineComponent} from 'vue';
+<script lang="ts" setup>
 import useComponentCommon from '../hooks/useComponentCommon';
 import {
   transformToComponentProps,
   textDefaultProps,
   textStylePropNames,
 } from '../defaultProps';
+
 const defaultProps = transformToComponentProps(textDefaultProps);
-// array that contains style props
-export default defineComponent({
-  name: 'l-text',
-  props: {
-    tag: {
-      type: String,
-      default: 'div',
-    },
-    ...defaultProps,
+const props = defineProps({
+  tag: {
+    type: String,
+    default: 'div',
   },
-  setup(props) {
-    // 重用并且简化
-    // 抽离并且获得 styleProps
-    const {styleProps, handleClick} = useComponentCommon(
-      props,
-      textStylePropNames
-    );
-    return {
-      styleProps,
-      handleClick,
-    };
-  },
+  ...transformToComponentProps(textDefaultProps),
 });
+
+// 重用并且简化
+// 抽离并且获得 styleProps
+const {styleProps, handleClick} = useComponentCommon(props, textStylePropNames);
 </script>
 
-<style scoped>
+<style scoped lang="less">
 h2.l-text-component,
 p.l-text-component {
   margin-bottom: 0;
