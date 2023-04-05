@@ -75,6 +75,7 @@ const editWrapper = ref<null | HTMLElement>(null);
 const onItemClick = (id: string) => {
   emit('set-active', id);
 };
+
 const gap = {
   x: 0,
   y: 0,

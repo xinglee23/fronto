@@ -93,6 +93,31 @@ const updatePosition = (data: {left: number; top: number; id: string}) => {
     width: 100%;
     color: black;
     background-color: #e5e5e5;
+    overflow: hidden;
+
+    .preview-list {
+      padding: 0;
+      margin: 0;
+      min-height: 200px;
+      min-width: 800px;
+      border: 1px solid #efefef;
+      background: #fff;
+      overflow-x: hidden;
+      overflow-y: auto;
+      position: fixed;
+      margin-top: 50px;
+      max-height: 80vh;
+
+      .canvas-fix,
+      .edit-wrapper > * {
+        box-shadow: none !important;
+      }
+
+      .canvas-fix {
+        position: absolute;
+        max-height: none;
+      }
+    }
   }
 
   .right {
