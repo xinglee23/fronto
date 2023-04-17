@@ -18,56 +18,48 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent, PropType} from 'vue';
+<script lang="ts" setup>
+import {PropType} from 'vue';
 import axios from 'axios';
 import {useStore} from 'vuex';
 import {useRouter} from 'vue-router';
 import {message} from 'ant-design-vue';
 import {UserProps} from '../store/user';
 
-export default defineComponent({
-  name: 'user-profile',
-  props: {
-    user: {
-      type: Object as PropType<UserProps>,
-      required: true,
-    },
-  },
-  setup() {
-    const store = useStore();
-    const router = useRouter();
-    const createDesign = async () => {
-      const payload = {
-        title: '未命名作品',
-        desc: '未命名作品',
-        coverImg:
-          'http://typescript-vue.oss-cn-beijing.aliyuncs.com/vue-marker/5f81cca3f3bf7a0e1ebaf885.png',
-      };
-      const postData = {
-        method: 'post',
-        data: payload,
-        opName: 'createDesign',
-      } as any;
-      const {data} = await axios('/works', postData);
-      message.success('创建作品成功', 2);
-      router.push(`/editor/${data.data.id}`);
-    };
-    const logout = () => {
-      store.commit('logout');
-      message.success('退出登录成功，2秒后跳转到首页', 2);
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
-    };
-    return {
-      logout,
-      createDesign,
-    };
+defineProps({
+  user: {
+    type: Object as PropType<UserProps>,
+    required: true,
   },
 });
+
+const store = useStore();
+const router = useRouter();
+const createDesign = async () => {
+  const payload = {
+    title: '未命名作品',
+    desc: '未命名作品',
+    coverImg:
+      'http://typescript-vue.oss-cn-beijing.aliyuncs.com/vue-marker/5f81cca3f3bf7a0e1ebaf885.png',
+  };
+  const postData = {
+    method: 'post',
+    data: payload,
+    opName: 'createDesign',
+  } as any;
+  const {data} = await axios('/works', postData);
+  message.success('创建作品成功', 2);
+  router.push(`/editor/${data.data.id}`);
+};
+const logout = () => {
+  store.commit('logout');
+  message.success('退出登录成功，2秒后跳转到首页', 2);
+  setTimeout(() => {
+    router.push('/');
+  }, 2000);
+};
 </script>
-<style>
+<style scoped lang="less">
 .user-profile-dropdown {
   border-radius: 2px !important;
 }
