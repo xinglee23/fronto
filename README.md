@@ -1,6 +1,6 @@
 # A Visual Editor
 
-## Feature
+## Feature 🚀 
 
 - out of the box
 - typescript
